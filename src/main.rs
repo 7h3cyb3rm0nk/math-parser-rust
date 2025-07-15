@@ -22,7 +22,7 @@ fn main() -> io::Result<()> {
             println!("invalid expression");
             continue;
         }
-        let parser = Parser::from(expression.chars().collect());
+        let parser = Parser::from(expression);
 
         println!("{:?}", parser.tokens);
     }
@@ -34,7 +34,7 @@ mod tests {
     use crate::tokens::Token;
     #[test]
     fn check_equal_tokens() {
-        let char_vec: Vec<char> = vec!['9', '0', '0', '+', '9', '0', '*', '9', '/', '2', '0'];
+        let char_vec = "900+90*9/20";
         let token_vec: Vec<Token> = vec![
             Token::Number(900),
             Token::Plus,
@@ -49,7 +49,7 @@ mod tests {
     }
     #[test]
     fn check_different_tokens() {
-        let char_vec: Vec<char> = vec!['9', '0', '+', '9', '0', '*', '9', '/', '2'];
+        let char_vec = "900+90*3";
         let token_vec: Vec<Token> = vec![
             Token::Number(900),
             Token::Plus,

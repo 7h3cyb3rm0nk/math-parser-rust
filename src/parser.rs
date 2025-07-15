@@ -15,11 +15,11 @@ impl Parser {
             tokens: Vec::new(),
         }
     }
-    pub fn from(tokens: Vec<char>) -> Self {
-        let tokens = Parser::tokenize(tokens).unwrap_or(vec![Token::Invalid]);
+    pub fn from(input: &str) -> Self {
+        let tokens = Parser::tokenize(input.chars().collect()).unwrap_or(vec![Token::Invalid]);
         Parser {
-            _last_token: None,
             _last_token_type: None,
+            _last_token: None,
             tokens,
         }
     }
@@ -40,6 +40,8 @@ impl Parser {
                 ')' => tokens.push(Token::ParanthesisClose),
                 '^' => tokens.push(Token::Power),
                 '%' => tokens.push(Token::Modulus),
+
+                // logic to form number tokens
                 '0'..='9' => {
                     let mut num = (input[i] as u32 - '0' as u32) as i64;
                     i += 1;
