@@ -1,14 +1,22 @@
-use std::io::BufRead;
+use std::io::{self, stdout, BufRead, Write};
 mod parser;
 mod tokens;
 use parser::Parser;
 
-fn main() {
-    let handle = std::io::stdin().lock();
-    for line in handle.lines() {
-        let expression = line.expect("stdin error:");
-        if expression.len() == 2 && expression.starts_with('q') {
-            return;
+fn main() -> io::Result<()> {
+    let mut input: String = String::new();
+    let mut handle = std::io::stdin().lock();
+    loop {
+        print!("> ");
+        stdout().flush()?;
+        input.clear();
+        let n = handle.read_line(&mut input)?;
+        if n == 0 {
+            continue;
+        }
+        let expression = input.trim();
+        if expression == "q" {
+            return Ok(());
         }
         if expression.chars().any(|x| x.is_alphabetic()) {
             println!("invalid expression");
