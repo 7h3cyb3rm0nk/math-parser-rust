@@ -16,7 +16,7 @@ impl Parser {
         }
     }
     pub fn from(tokens: Vec<char>) -> Self {
-        let tokens = Parser::tokenize(tokens);
+        let tokens = Parser::tokenize(tokens).unwrap_or(vec![Token::Invalid]);
         Parser {
             _last_token: None,
             _last_token_type: None,
@@ -24,9 +24,9 @@ impl Parser {
         }
     }
 
-    fn tokenize(input: Vec<char>) -> Vec<Token> {
+    fn tokenize(input: Vec<char>) -> Result<Vec<Token>, String> {
         if input.is_empty() {
-            return Vec::new();
+            return Ok(Vec::new());
         }
         let mut tokens: Vec<Token> = Vec::with_capacity(input.len());
         let mut i = 0;
@@ -54,10 +54,11 @@ impl Parser {
                 ' ' | '\n' => {}
                 _ => {
                     eprintln!("error unexpected character '{}'", input[i]);
+                    return Err(format!("unexpected character found: {}", input[i]));
                 }
             }
             i += 1;
         }
-        tokens
+        Ok(tokens)
     }
 }

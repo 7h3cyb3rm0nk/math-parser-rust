@@ -8,4 +8,5 @@ pub enum Token {
     Number(i64),
     ParanthesisOpen,
     ParanthesisClose,
+    Invalid,
 }
