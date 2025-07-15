@@ -1,11 +1,12 @@
+use std::io::BufRead;
 mod parser;
 mod tokens;
 use parser::Parser;
 
 fn main() {
-    loop {
-        let mut expression: String = String::new();
-        std::io::stdin().read_line(&mut expression).unwrap();
+    let handle = std::io::stdin().lock();
+    for line in handle.lines() {
+        let expression = line.expect("stdin error:");
         if expression.len() == 2 && expression.starts_with('q') {
             return;
         }

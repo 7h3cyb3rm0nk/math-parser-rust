@@ -39,6 +39,7 @@ impl Parser {
                 '(' => tokens.push(Token::ParanthesisOpen),
                 ')' => tokens.push(Token::ParanthesisClose),
                 '^' => tokens.push(Token::Power),
+                '%' => tokens.push(Token::Modulus),
                 '0'..='9' => {
                     let mut num = (input[i] as u32 - '0' as u32) as i64;
                     i += 1;

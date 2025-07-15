@@ -5,6 +5,7 @@ pub enum Token {
     Star,
     Slash,
     Power,
+    Modulus,
     Number(i64),
     ParanthesisOpen,
     ParanthesisClose,
