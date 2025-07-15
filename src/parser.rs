@@ -1,49 +1,63 @@
 use crate::tokens::Token;
 #[derive(Debug)]
 pub struct Parser {
-    last_token: Option<char>,
-    last_token_type: Option<Token>,
-    tokens: Vec<Token>,
+    _last_token: Option<char>,
+    _last_token_type: Option<Token>,
+    pub tokens: Vec<Token>,
 }
 
 impl Parser {
+    #[allow(unused)]
     pub fn new() -> Self {
         Parser {
-            last_token: None,
-            last_token_type: None,
+            _last_token: None,
+            _last_token_type: None,
             tokens: Vec::new(),
         }
     }
     pub fn from(tokens: Vec<char>) -> Self {
-        let mut tokens = Parser::tokenize(tokens);
+        let tokens = Parser::tokenize(tokens);
         Parser {
-            last_token: None,
-            last_token_type: None,
+            _last_token: None,
+            _last_token_type: None,
             tokens,
         }
     }
 
-    pub fn tokenize(tokens: Vec<char>) -> Vec<Token> {
-        let mut token_vec: Vec<Token> = vec![];
-        let mut token_iter = tokens.iter().peekable();
-        while let Some(&current_char) = token_iter.next() {
-            match current_char {
-                '+' => token_vec.push(Token::Plus),
-                '-' => token_vec.push(Token::Minus),
-                '/' => token_vec.push(Token::Slash),
-                '*' => token_vec.push(Token::Star),
-                '(' => token_vec.push(Token::ParanthesisOpen),
-                ')' => token_vec.push(Token::ParanthesisClose),
-                x if x.is_ascii_digit() => {
-                    let mut digit_str: String = x.to_string();
-                    while let Some(&next_char) = token_iter.next_if(|&x| x.is_ascii_digit()) {
-                        digit_str.push(next_char);
-                    }
-                    token_vec.push(Token::Number(digit_str))
-                }
-                _ => {}
-            }
+    fn tokenize(input: Vec<char>) -> Vec<Token> {
+        if input.is_empty() {
+            return Vec::new();
         }
-        token_vec
+        let mut tokens: Vec<Token> = Vec::with_capacity(input.len());
+        let mut i = 0;
+        while i < input.len() {
+            match input[i] {
+                '+' => tokens.push(Token::Plus),
+                '-' => tokens.push(Token::Minus),
+                '/' => tokens.push(Token::Slash),
+                '*' => tokens.push(Token::Star),
+                '(' => tokens.push(Token::ParanthesisOpen),
+                ')' => tokens.push(Token::ParanthesisClose),
+                '^' => tokens.push(Token::Power),
+                '0'..='9' => {
+                    let mut num = (input[i] as u32 - '0' as u32) as i64;
+                    i += 1;
+
+                    while i < input.len() && input[i].is_ascii_digit() {
+                        num = num * 10 + (input[i] as u32 - '0' as u32) as i64;
+                        i += 1;
+                    }
+
+                    tokens.push(Token::Number(num));
+                    continue;
+                }
+                ' ' | '\n' => {}
+                _ => {
+                    eprintln!("error unexpected character '{}'", input[i]);
+                }
+            }
+            i += 1;
+        }
+        tokens
     }
 }

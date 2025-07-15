@@ -4,7 +4,8 @@ pub enum Token {
     Minus,
     Star,
     Slash,
-    Number(String),
+    Power,
+    Number(i64),
     ParanthesisOpen,
     ParanthesisClose,
 }
