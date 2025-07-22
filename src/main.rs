@@ -1,4 +1,7 @@
+#![allow(dead_code, unused_variables)]
+
 use std::io::{self, stdout, BufRead, Write};
+mod ast;
 mod parser;
 mod tokens;
 use parser::Parser;
@@ -30,6 +33,7 @@ fn main() -> io::Result<()> {
 
 #[cfg(test)]
 mod tests {
+    use crate::ast::Ast;
     use crate::parser::Parser;
     use crate::tokens::Token;
     #[test]
@@ -63,8 +67,17 @@ mod tests {
         assert_ne!(parser.tokens, token_vec);
     }
 
+    // #[test]
+    // fn check_ast_trees() {
+    //     panic!()
+    // }
+    //
     #[test]
-    fn check_ast_trees() {
-        panic!()
+    fn test_single_number_parsing() {
+        let single_num = "9";
+        let ast = Box::new(Ast::Number(9_i64));
+        let mut parser = Parser::from(single_num);
+        parser.parse();
+        assert_eq!(Some(ast), parser.ast)
     }
 }

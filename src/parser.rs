@@ -1,26 +1,27 @@
+use crate::ast::Ast;
 use crate::tokens::Token;
 #[derive(Debug)]
 pub struct Parser {
-    _last_token: Option<char>,
-    _last_token_type: Option<Token>,
+    pub pos: usize,
     pub tokens: Vec<Token>,
+    pub ast: Option<Box<Ast>>,
 }
 
 impl Parser {
     #[allow(unused)]
     pub fn new() -> Self {
         Parser {
-            _last_token: None,
-            _last_token_type: None,
+            ast: None,
+            pos: 0,
             tokens: Vec::new(),
         }
     }
     pub fn from(input: &str) -> Self {
         let tokens = Parser::tokenize(input.chars().collect()).unwrap_or(vec![Token::Invalid]);
         Parser {
-            _last_token_type: None,
-            _last_token: None,
+            pos: 0,
             tokens,
+            ast: None,
         }
     }
 
@@ -64,4 +65,22 @@ impl Parser {
         }
         Ok(tokens)
     }
+
+    pub fn parse(&mut self) {
+        let i: usize = 0;
+        let token_len = self.tokens.len();
+        if let Token::Number(x) = self.tokens[0] {
+            if token_len == 1 {
+                self.ast = Some(Box::new(Ast::Number(x)));
+            }
+        }
+    }
+
+    pub fn parse_term(node: &mut Box<Ast>) {}
+
+    pub fn parse_factor(node: &mut Box<Ast>) {}
+
+    pub fn parse_unary(node: &mut Box<Ast>) {}
+
+    pub fn parse_primary(node: &mut Box<Ast>) {}
 }
