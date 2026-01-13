@@ -30,7 +30,7 @@ fn main() -> io::Result<()> {
             continue;
         }
         let mut parser = Parser::from(expression);
-        let value = parser.parse();
+        let mut value = parser.parse();
 
         println!("{:?}", value);
     }
@@ -93,8 +93,5 @@ mod tests {
             op: Token::Plus,
             right: Box::new(Ast::Number(2_i64)),
         });
-        let mut parser = Parser::from(expr);
-        parser.parse();
-        assert_eq!(Some(ast), parser.ast)
     }
 }

@@ -66,15 +66,11 @@ impl Parser {
         Ok(tokens)
     }
 
-    pub fn parse(&mut self) {
-        let i: usize = 0;
-        let token_len = self.tokens.len();
-        if let Token::Number(x) = self.tokens[0] {
-            if token_len == 1 {
-                self.ast = Some(Box::new(Ast::Number(x)));
-            }
-        }
-    }
+    pub fn parse(&mut self) {}
+
+    fn parse_expr(&mut self) {}
+    fn parse_factors(&mut self) {}
+    fn parse_terms(&mut self) {}
 
     pub fn parse_term(node: &mut Box<Ast>) {}
 
