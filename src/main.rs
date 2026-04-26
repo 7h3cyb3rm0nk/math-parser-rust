@@ -31,8 +31,11 @@ fn main() -> io::Result<()> {
         }
         let mut parser = Parser::from(expression);
         let value = parser.parse();
-
-        println!("{:#?}", value.unwrap());
+        if value.is_none() {
+            println!("wait that's illegal!");
+        } else {
+            println!("{:#?}", value.unwrap());
+        }
     }
 }
 
