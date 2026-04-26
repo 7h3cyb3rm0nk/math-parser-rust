@@ -1,5 +1,3 @@
-use std::slice::{Iter, IterMut};
-
 use crate::ast::Ast;
 use crate::tokens::Token;
 #[derive(Debug)]
@@ -10,7 +8,6 @@ pub struct Parser {
 }
 
 impl Parser {
-    #[allow(unused)]
     pub fn new() -> Self {
         Parser {
             ast: None,
@@ -80,7 +77,11 @@ impl Parser {
 
     pub fn parse(&mut self) -> Option<Ast> {
         let ast = self.parse_expr()?;
-        Some(ast)
+        if let Some(Token::End) = self.current() {
+            Some(ast)
+        } else {
+            None
+        }
     }
 
     fn parse_expr(&mut self) -> Option<Ast> {
