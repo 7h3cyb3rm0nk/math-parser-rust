@@ -1,6 +1,6 @@
 #![allow(dead_code, unused_variables)]
 
-use std::io::{self, stdout, BufRead, Write};
+use std::io::{self, BufRead, Write, stdout};
 mod ast;
 mod parser;
 mod tokens;
@@ -32,7 +32,7 @@ fn main() -> io::Result<()> {
         let mut parser = Parser::from(expression);
         let value = parser.parse();
 
-        println!("{:?}", value);
+        println!("{:#?}", value.unwrap());
     }
 }
 

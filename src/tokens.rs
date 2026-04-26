@@ -1,6 +1,6 @@
 use std::ops::{Add, BitXor, Div, Mul, Sub};
 
-#[derive(Debug, PartialEq, Eq, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum Token {
     Plus,
     Minus,
@@ -12,6 +12,7 @@ pub enum Token {
     ParanthesisOpen,
     ParanthesisClose,
     Invalid,
+    End,
 }
 
 impl Add for Token {

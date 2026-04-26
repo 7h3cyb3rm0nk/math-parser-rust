@@ -1,3 +1,5 @@
+use std::slice::{Iter, IterMut};
+
 use crate::ast::Ast;
 use crate::tokens::Token;
 #[derive(Debug)]
@@ -25,7 +27,7 @@ impl Parser {
         }
     }
 
-    fn tokenize(input: Vec<char>) -> Result<Vec<Token>, String> {
+    pub fn tokenize(input: Vec<char>) -> Result<Vec<Token>, String> {
         if input.is_empty() {
             return Ok(Vec::new());
         }
@@ -63,20 +65,98 @@ impl Parser {
             }
             i += 1;
         }
+        tokens.push(Token::End);
         Ok(tokens)
     }
 
-    pub fn parse(&mut self) {}
+    fn advance(&mut self) -> Option<&Token> {
+        let tok = self.tokens.get(self.pos);
+        self.pos += 1;
+        tok
+    }
+    fn current(&self) -> Option<&Token> {
+        self.tokens.get(self.pos)
+    }
 
-    fn parse_expr(&mut self) {}
-    fn parse_factors(&mut self) {}
-    fn parse_terms(&mut self) {}
+    pub fn parse(&mut self) -> Option<Ast> {
+        let ast = self.parse_expr()?;
+        Some(ast)
+    }
 
-    pub fn parse_term(node: &mut Box<Ast>) {}
+    fn parse_expr(&mut self) -> Option<Ast> {
+        let mut node = self.parse_term()?;
+        while let Some(Token::Plus) | Some(Token::Minus) = self.current() {
+            let op = *self.advance()?;
+            let rhs = self.parse_term()?;
+            node = Ast::BinaryOp {
+                left: Box::new(node),
+                op,
+                right: Box::new(rhs),
+            };
+        }
 
-    pub fn parse_factor(node: &mut Box<Ast>) {}
+        Some(node)
+    }
+    fn parse_factor(&mut self) -> Option<Ast> {
+        let mut node = self.parse_unary()?;
+        if let Some(Token::Power) = self.current() {
+            let op = *self.advance()?;
+            let rhs = self.parse_factor()?;
+            node = Ast::BinaryOp {
+                left: Box::new(node),
+                op,
+                right: Box::new(rhs),
+            }
+        }
+        Some(node)
+    }
+    fn parse_term(&mut self) -> Option<Ast> {
+        let mut node = self.parse_factor()?;
 
-    pub fn parse_unary(node: &mut Box<Ast>) {}
+        while let Some(Token::Star) | Some(Token::Slash) | Some(Token::Modulus) = self.current() {
+            let op = *self.advance()?;
+            let rhs = self.parse_factor()?;
+            node = Ast::BinaryOp {
+                left: Box::new(node),
+                op,
+                right: Box::new(rhs),
+            };
+        }
 
-    pub fn parse_primary(node: &mut Box<Ast>) {}
+        Some(node)
+    }
+    fn parse_unary(&mut self) -> Option<Ast> {
+        match self.current() {
+            Some(Token::Plus) | Some(Token::Minus) => {
+                let op = *self.advance()?;
+                let expr = self.parse_unary()?;
+                Some(Ast::UnaryOp {
+                    op,
+                    expr: Box::new(expr),
+                })
+            }
+            _ => self.parse_primary(),
+        }
+    }
+    fn parse_primary(&mut self) -> Option<Ast> {
+        match self.current() {
+            Some(Token::Number(x)) => {
+                let val = *x;
+                self.advance()?;
+                Some(Ast::Number(val))
+            }
+            Some(Token::ParanthesisOpen) => {
+                self.advance();
+                let expr = self.parse_expr()?;
+                match self.current() {
+                    Some(Token::ParanthesisClose) => {
+                        self.advance();
+                        Some(expr)
+                    }
+                    _ => None,
+                }
+            }
+            _ => None,
+        }
+    }
 }
