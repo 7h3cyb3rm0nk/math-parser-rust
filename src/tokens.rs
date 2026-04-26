@@ -1,4 +1,8 @@
-use std::ops::{Add, BitXor, Div, Mul, Sub};
+use core::fmt;
+use std::{
+    fmt::Formatter,
+    ops::{Add, BitXor, Div, Mul, Sub},
+};
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum Token {
@@ -67,6 +71,21 @@ impl BitXor for Token {
                 }
             }
             _ => Err("Invalid Operation".into()),
+        }
+    }
+}
+
+impl std::fmt::Display for Token {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        match self {
+            Token::Plus => write!(f, "+"),
+            Token::Minus => write!(f, "-"),
+            Token::Star => write!(f, "*"),
+            Token::Slash => write!(f, "/"),
+            Token::Modulus => write!(f, "%"),
+            Token::Number(x) => write!(f, "{}", *x),
+            Token::Power => write!(f, "^"),
+            _ => write!(f, ""),
         }
     }
 }

@@ -4,15 +4,13 @@ use std::io::{self, BufRead, Write, stdout};
 mod ast;
 mod parser;
 mod tokens;
+use display_tree::Color;
+use display_tree::{AsTree, CharSet, StyleBuilder};
 use parser::Parser;
-use tokens::Token;
 
 fn main() -> io::Result<()> {
     let mut input: String = String::new();
     let mut handle = std::io::stdin().lock();
-    let n1 = Token::Number(1);
-    let n2 = Token::Number(2);
-    println!("{}", (n1 + n2).unwrap());
     loop {
         print!("> ");
         stdout().flush()?;
@@ -22,7 +20,7 @@ fn main() -> io::Result<()> {
             continue;
         }
         let expression = input.trim();
-        if expression == "q" {
+        if expression == "q" || expression == "quit" {
             return Ok(());
         }
         if expression.chars().any(|x| x.is_alphabetic()) {
@@ -31,10 +29,18 @@ fn main() -> io::Result<()> {
         }
         let mut parser = Parser::from(expression);
         let value = parser.parse();
-        if value.is_none() {
-            println!("wait that's illegal!");
+
+        if let Some(ref ast_tree) = value {
+            let tree = format!(
+                "{}",
+                AsTree::new(ast_tree)
+                    .char_set(CharSet::SINGLE_LINE_BOLD)
+                    .leaf_color(Color::Green)
+                    .branch_color(Color::White)
+            );
+            println!("{}", tree);
         } else {
-            println!("{:#?}", value.unwrap());
+            println!("wait that's illegal!");
         }
     }
 }
