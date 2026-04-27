@@ -46,3 +46,49 @@ impl Clone for Ast {
         }
     }
 }
+
+impl Ast {
+    #[allow(dead_code)]
+    pub fn eval(&self) -> Option<i64> {
+        match self {
+            Self::Number(x) => Some(*x),
+            Self::BinaryOp { left, op, right } => match *op {
+                Token::Plus => {
+                    let result = left.eval()? + right.eval()?;
+                    Some(result)
+                }
+                Token::Minus => {
+                    let result = left.eval()? - right.eval()?;
+                    Some(result)
+                }
+                Token::Slash => {
+                    let result = left.eval()? / right.eval()?;
+                    Some(result)
+                }
+                Token::Star => {
+                    let result = left.eval()? * right.eval()?;
+                    Some(result)
+                }
+                Token::Power => {
+                    let exp = right.eval()? as u32;
+                    let result = left.eval()?.pow(exp);
+                    Some(result)
+                }
+                Token::Modulus => {
+                    let result = left.eval()? % right.eval()?;
+                    Some(result)
+                }
+
+                _ => None,
+            },
+            Self::UnaryOp { op, expr } => {
+                let result = expr.eval()?;
+                match *op {
+                    Token::Plus => Some(result),
+                    Token::Minus => Some(result),
+                    _ => None,
+                }
+            }
+        }
+    }
+}

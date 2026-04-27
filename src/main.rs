@@ -1,11 +1,13 @@
+#![allow(unused_variables, unused_imports)]
+
 use std::io::{self, BufRead, Write, stdout};
 mod ast;
 mod parser;
 mod tokens;
 use display_tree::Color;
 use display_tree::{AsTree, CharSet, StyleBuilder};
+use owo_colors::{OwoColorize, Style};
 use parser::Parser;
-
 fn main() -> io::Result<()> {
     let mut input: String = String::new();
     let mut handle = std::io::stdin().lock();
@@ -27,7 +29,11 @@ fn main() -> io::Result<()> {
         }
         let mut parser = Parser::from(expression);
         let value = parser.parse();
-
+        let owo_color_style = Style::new()
+            .bright_red()
+            .on_truecolor(142, 179, 227)
+            .bold()
+            .blink();
         if let Some(ast_tree) = value {
             let tree = format!(
                 "{}",
@@ -37,6 +43,7 @@ fn main() -> io::Result<()> {
                     .branch_color(Color::White)
             );
             println!("{}", tree);
+            println!("evaluated value => {}", ast_tree.eval().unwrap());
         } else {
             println!("wait that's illegal!");
         }

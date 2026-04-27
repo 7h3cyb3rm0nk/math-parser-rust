@@ -166,4 +166,8 @@ impl Parser {
             _ => None,
         }
     }
+    #[allow(dead_code)]
+    fn eval(&self) -> Option<i64> {
+        None
+    }
 }
