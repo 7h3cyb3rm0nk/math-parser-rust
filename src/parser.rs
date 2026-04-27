@@ -1,13 +1,16 @@
+use std::rc::Rc;
+
 use crate::ast::Ast;
 use crate::tokens::Token;
 #[derive(Debug)]
 pub struct Parser {
     pub pos: usize,
     pub tokens: Vec<Token>,
-    pub ast: Option<Box<Ast>>,
+    pub ast: Option<Rc<Ast>>,
 }
 
 impl Parser {
+    #[allow(unused)]
     pub fn new() -> Self {
         Parser {
             ast: None,
@@ -75,11 +78,14 @@ impl Parser {
         self.tokens.get(self.pos)
     }
 
-    pub fn parse(&mut self) -> Option<Ast> {
+    pub fn parse(&mut self) -> Option<Rc<Ast>> {
         let ast = self.parse_expr()?;
+        let ast_clone = Rc::new(ast);
         if let Some(Token::End) = self.current() {
-            Some(ast)
+            self.ast = Some(ast_clone.clone());
+            Some(ast_clone)
         } else {
+            self.ast = None;
             None
         }
     }

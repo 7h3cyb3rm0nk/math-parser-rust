@@ -1,5 +1,3 @@
-#![allow(dead_code, unused_variables)]
-
 use std::io::{self, BufRead, Write, stdout};
 mod ast;
 mod parser;
@@ -30,10 +28,10 @@ fn main() -> io::Result<()> {
         let mut parser = Parser::from(expression);
         let value = parser.parse();
 
-        if let Some(ref ast_tree) = value {
+        if let Some(ast_tree) = value {
             let tree = format!(
                 "{}",
-                AsTree::new(ast_tree)
+                AsTree::new(ast_tree.as_ref())
                     .char_set(CharSet::SINGLE_LINE_BOLD)
                     .leaf_color(Color::Green)
                     .branch_color(Color::White)
@@ -47,6 +45,8 @@ fn main() -> io::Result<()> {
 
 #[cfg(test)]
 mod tests {
+    use std::rc::Rc;
+
     use crate::ast::Ast;
     use crate::parser::Parser;
     use crate::tokens::Token;
@@ -61,6 +61,7 @@ mod tests {
             Token::Number(9),
             Token::Slash,
             Token::Number(20),
+            Token::End,
         ];
         let parser: Parser = Parser::from(char_vec);
         assert_eq!(parser.tokens, token_vec);
@@ -89,21 +90,31 @@ mod tests {
     #[test]
     fn test_single_number_parsing() {
         let single_num = "9";
-        let ast = Box::new(Ast::Number(9_i64));
+        let ast = Ast::Number(9_i64);
         let mut parser = Parser::from(single_num);
         parser.parse();
-        assert_eq!(Some(ast), parser.ast)
+        assert_eq!((Some(Rc::new(ast))), parser.ast)
     }
     #[test]
     fn test_ast_tree_add() {
         let expr = "9+2";
-        let ast: Box<Ast> = Box::new(Ast::BinaryOp {
+        let ast: Ast = Ast::BinaryOp {
             left: Box::new(Ast::Number(9_i64)),
             op: Token::Plus,
             right: Box::new(Ast::Number(2_i64)),
-        });
+        };
         let mut parser = Parser::from(expr);
         parser.parse();
-        assert_eq!(Some(ast), parser.ast)
+        assert_eq!(Some(Rc::new(ast)), parser.ast)
+    }
+    #[test]
+    fn test_ast_tree_cloning() {
+        let ast: Ast = Ast::BinaryOp {
+            left: Box::new(Ast::Number(9_i64)),
+            op: Token::Plus,
+            right: Box::new(Ast::Number(2_i64)),
+        };
+        let ast_cloned = ast.clone();
+        assert_eq!(ast, ast_cloned)
     }
 }

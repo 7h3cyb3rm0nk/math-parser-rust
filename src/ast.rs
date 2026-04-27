@@ -29,3 +29,20 @@ impl std::fmt::Display for Ast {
         }
     }
 }
+
+impl Clone for Ast {
+    fn clone(&self) -> Self {
+        match self {
+            Self::Number(x) => Self::Number(*x),
+            Self::UnaryOp { op, expr } => Self::UnaryOp {
+                op: *op,
+                expr: Box::new((**expr).clone()),
+            },
+            Self::BinaryOp { left, op, right } => Self::BinaryOp {
+                left: Box::new((**left).clone()),
+                op: *op,
+                right: Box::new((**right).clone()),
+            },
+        }
+    }
+}
